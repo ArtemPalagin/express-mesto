@@ -17,10 +17,10 @@ module.exports.postCard = (req, res) => {
   });
 }
 module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.id)
+  Card.findByIdAndRemove(req.params.cardId)
   .then((card) => {
-    if(!user) {
-      res.status(404).send({ message: 'Такого пользователя не существует' });
+    if(!card) {
+      res.status(404).send({ message: 'Такой карточки не существует' });
     }
     res.send({ data: card })
   })
@@ -34,8 +34,8 @@ module.exports.deleteCard = (req, res) => {
 module.exports.likeCard = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId,{ $addToSet: { likes: req.user._id } }, { new: true })
   .then((card) => {
-    if(!user) {
-      res.status(404).send({ message: 'Такого пользователя не существует' });
+    if(!card) {
+      res.status(404).send({ message: 'Такой карточки не существует' });
     }
     res.send({ data: card })
   })
@@ -50,8 +50,8 @@ module.exports.likeCard = (req, res) => {
 module.exports.dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId,{ $pull: { likes: req.user._id } },{ new: true })
   .then((card) => {
-    if(!user) {
-      res.status(404).send({ message: 'Такого пользователя не существует' });
+    if(!card) {
+      res.status(404).send({ message: 'Такой карточки не существует' });
     }
     res.send({ data: card })
   })
