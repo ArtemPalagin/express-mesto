@@ -1,12 +1,29 @@
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      res.send({ token });
+      // res.send({ data: user });
+    })
+    .catch(() => {
+      res
+        .status(401)
+        .send({ message: 'Токен некорректен' });
+    });
+};
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send({ data: users }))
     .catch((err) => res.status(500).send({ message: err.message }));
 };
 module.exports.getUser = (req, res) => {
-  User.findById(req.params.userId)
+  User.findById(req.user._id)
     .then((user) => {
       if (!user) {
         return res.status(404).send({ message: 'Такого пользователя не существует' });
@@ -20,15 +37,21 @@ module.exports.getUser = (req, res) => {
       return res.status(500).send({ message: err.message });
     });
 };
-module.exports.postUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Некорректные данные' });
-      }
-      return res.status(500).send({ message: err.message });
+module.exports.createUser = (req, res) => {
+  const { email, password } = req.body;
+
+  bcrypt.hash(password, 10)
+    .then((hash) => {
+      User.create({ email, password: hash })
+        .then((user) => {
+          res.send({ data: user });
+        })
+        .catch((err) => {
+          if (err.name === 'MongoError' && err.code === 11000) {
+            return res.status(409).send({ message: 'Пользователь с таким email уже существует' });
+          }
+          return res.status(500).send({ message: err });
+        });
     });
 };
 module.exports.patchProfile = (req, res) => {
