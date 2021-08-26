@@ -23,7 +23,7 @@ module.exports.deleteCard = (req, res) => {
         return res.status(404).send({ message: 'Такой карточки не существует' });
       }
       if (req.user._id !== req.body.owner) {
-        return res.status(500).send({ message: 'Чужую карточку удалять нельзя' });
+        return res.status(403).send({ message: 'Чужую карточку удалять нельзя' });
       }
       return res.send({ data: card });
     })

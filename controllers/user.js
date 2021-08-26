@@ -9,12 +9,11 @@ module.exports.login = (req, res) => {
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
       res.send({ token });
-      // res.send({ data: user });
     })
-    .catch(() => {
+    .catch((err) => {
       res
         .status(401)
-        .send({ message: 'Токен некорректен' });
+        .send({ message: err.message });
     });
 };
 module.exports.getUsers = (req, res) => {
@@ -22,8 +21,17 @@ module.exports.getUsers = (req, res) => {
     .then((users) => res.send({ data: users }))
     .catch((err) => res.status(500).send({ message: err.message }));
 };
-module.exports.getUser = (req, res) => {
+module.exports.getRegisteredUser = (req, res) => {
   User.findById(req.user._id)
+    .then((user) => {
+      res.send({ data: user });
+    })
+    .catch((err) => {
+      res.status(500).send({ message: err.message });
+    });
+};
+module.exports.getUser = (req, res) => {
+  User.findById(req.params.id)
     .then((user) => {
       if (!user) {
         return res.status(404).send({ message: 'Такого пользователя не существует' });
@@ -32,7 +40,7 @@ module.exports.getUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Невалидный id ' });
+        return res.status(400).send({ message: 'Невалидный id' });
       }
       return res.status(500).send({ message: err.message });
     });
@@ -61,6 +69,9 @@ module.exports.patchProfile = (req, res) => {
       if (!user) {
         return res.status(404).send({ message: 'Такого пользователя не существует' });
       }
+      if (!name || !about) {
+        return res.status(400).send({ message: 'Есть незаполненное поле' });
+      }
       return res.send({ data: user });
     })
     .catch((err) => {
@@ -79,6 +90,9 @@ module.exports.patchAvatar = (req, res) => {
     .then((user) => {
       if (!user) {
         return res.status(404).send({ message: 'Такого пользователя не существует' });
+      }
+      if (!avatar) {
+        return res.status(400).send({ message: 'Есть незаполненное поле' });
       }
       return res.send({ data: user });
     })
