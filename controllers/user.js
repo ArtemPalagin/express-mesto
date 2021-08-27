@@ -1,8 +1,11 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
+const {
+  AuthenticationError, ConflictError, NotFoundError, RequestError,
+} = require('../errors/export-errors');
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -11,41 +14,36 @@ module.exports.login = (req, res) => {
       res.send({ token });
     })
     .catch((err) => {
-      res
-        .status(401)
-        .send({ message: err.message });
-    });
+      throw new AuthenticationError(err.message);
+    }).catch(next);
 };
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch(next);
 };
-module.exports.getRegisteredUser = (req, res) => {
+module.exports.getRegisteredUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       res.send({ data: user });
     })
-    .catch((err) => {
-      res.status(500).send({ message: err.message });
-    });
+    .catch(next);
 };
-module.exports.getUser = (req, res) => {
+module.exports.getUser = (req, res, next) => {
   User.findById(req.params.id)
     .then((user) => {
       if (!user) {
-        return res.status(404).send({ message: 'Такого пользователя не существует' });
+        throw new NotFoundError('Такого пользователя не существует');
       }
       return res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Невалидный id' });
+        throw new RequestError('Невалидный id');
       }
-      return res.status(500).send({ message: err.message });
-    });
+    }).catch(next);
 };
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const { email, password } = req.body;
 
   bcrypt.hash(password, 10)
@@ -56,53 +54,51 @@ module.exports.createUser = (req, res) => {
         })
         .catch((err) => {
           if (err.name === 'MongoError' && err.code === 11000) {
-            return res.status(409).send({ message: 'Пользователь с таким email уже существует' });
+            throw new ConflictError('Пользователь с таким email уже существует');
           }
-          return res.status(500).send({ message: err });
-        });
+        }).catch(next);
     });
 };
-module.exports.patchProfile = (req, res) => {
+module.exports.patchProfile = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        return res.status(404).send({ message: 'Такого пользователя не существует' });
+        throw new NotFoundError('Такого пользователя не существует');
       }
       if (!name || !about) {
-        return res.status(400).send({ message: 'Есть незаполненное поле' });
+        throw new RequestError('Есть незаполненное поле');
       }
       return res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Некорректные данные' });
+        throw new RequestError('Некорректные данные');
       }
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Невалидный id ' });
+        throw new RequestError('Невалидный id');
       }
-      return res.status(500).send({ message: err.message });
-    });
+    }).catch(next);
 };
-module.exports.patchAvatar = (req, res) => {
+module.exports.patchAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        return res.status(404).send({ message: 'Такого пользователя не существует' });
+        throw new NotFoundError('Такого пользователя не существует');
       }
       if (!avatar) {
-        return res.status(400).send({ message: 'Есть незаполненное поле' });
+        throw new RequestError('Есть незаполненное поле');
       }
       return res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Некорректные данные' });
+        throw new RequestError('Некорректные данные');
       }
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Невалидный id ' });
+        throw new RequestError('Невалидный id');
       }
-      return res.status(500).send({ message: err.message });
-    });
+      throw new RequestError(err.message);
+    }).catch(next);
 };

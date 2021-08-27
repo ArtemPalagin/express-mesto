@@ -4,6 +4,9 @@ const bodyParser = require('body-parser');
 const { errors, celebrate, Joi } = require('celebrate');
 const { login, createUser } = require('./controllers/user');
 const auth = require('./middlewares/auth');
+const {
+  NotFoundError,
+} = require('./errors/export-errors');
 
 const { PORT = 3000 } = process.env;
 
@@ -39,8 +42,21 @@ app.use('/', require('./routes/card'));
 
 app.use(errors());
 
-app.use((req, res) => {
-  res.status(404).send({ message: 'По этой ссылке ничего нет' });
+app.use((req, res, next) => {
+  next(new NotFoundError('По этой ссылке ничего нет'));
+});
+
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+
+  res
+    .status(statusCode)
+    .send({
+      message: statusCode === 500
+        ? 'На сервере произошла ошибка'
+        : message,
+    });
+  next();
 });
 
 app.listen(PORT);

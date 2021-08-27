@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     validate: {
       validator(v) {
-        return /https?:\/\/(www\.)?([\w\-.~:?#[\]@!$&'()*+,;=]){1,}#?/i.test(v);
+        return /^https?:\/\/(www\.)?([\w\-.~:?#[\]@!$&'()*+,;=]){1,}#?/i.test(v);
       },
       message: 'Такой ссылки не может быть',
     },
