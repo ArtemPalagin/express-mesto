@@ -19,7 +19,7 @@ router.patch('/users/me', celebrate({
 }), patchProfile);
 router.patch('/users/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required(),
+    avatar: Joi.string().required().dataUri(),
   }),
 }), patchAvatar);
 
