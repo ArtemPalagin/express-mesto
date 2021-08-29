@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "npx eslint .",
     "lint:fix": "eslint --fix --ext .js,.jsx .",
-    "start": "nodemon app.js"
+    "start": "nodemon app.js",
+    "deploy": "\"c:\\path\\to\\putty\\directory\\pscp.exe\" -i \"c:\\Users\\79030\\.ssh\\p.ppk\" -r ./* artem_plg@84.201.156.226:/home/artem_plg/express-mesto"
   },
   "keywords": [],
   "author": "",
@@ -23,9 +24,12 @@
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "celebrate": "^15.0.0",
+    "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "express-winston": "^4.2.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.13.7",
-    "validator": "^13.6.0"
+    "validator": "^13.6.0",
+    "winston": "^3.3.3"
   }
 }
