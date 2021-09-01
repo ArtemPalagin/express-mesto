@@ -27,7 +27,7 @@ module.exports.deleteCard = (req, res, next) => {
       if (req.user._id !== req.body.owner) {
         throw new ForbiddenError('Чужую карточку удалять нельзя');
       }
-      return res.send({ card });
+      return res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -41,7 +41,7 @@ module.exports.likeCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError('Такой карточки не существует');
       }
-      return res.send({ card });
+      return res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
