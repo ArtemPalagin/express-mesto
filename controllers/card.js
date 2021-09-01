@@ -6,6 +6,9 @@ const {
 module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.send(cards))
+    .catch((err) => {
+      throw err;
+    })
     .catch(next);
 };
 module.exports.postCard = (req, res, next) => {
@@ -16,6 +19,7 @@ module.exports.postCard = (req, res, next) => {
       if (err.name === 'ValidationError') {
         throw new RequestError('Некорректные данные');
       }
+      throw err;
     }).catch(next);
 };
 module.exports.deleteCard = (req, res, next) => {
@@ -33,6 +37,7 @@ module.exports.deleteCard = (req, res, next) => {
       if (err.name === 'CastError') {
         throw new RequestError('Невалидный id ');
       }
+      throw err;
     }).catch(next);
 };
 module.exports.likeCard = (req, res, next) => {
@@ -47,6 +52,7 @@ module.exports.likeCard = (req, res, next) => {
       if (err.name === 'CastError') {
         throw new RequestError('Невалидный id ');
       }
+      throw err;
     }).catch(next);
 };
 
@@ -62,5 +68,6 @@ module.exports.dislikeCard = (req, res, next) => {
       if (err.name === 'CastError') {
         throw new RequestError('Невалидный id ');
       }
+      throw err;
     }).catch(next);
 };

@@ -5,7 +5,7 @@ require('dotenv').config();
 const { NODE_ENV, JWT_SECRET } = process.env;
 const User = require('../models/user');
 const {
-  AuthenticationError, ConflictError, NotFoundError, RequestError,
+  ConflictError, NotFoundError, RequestError,
 } = require('../errors/export-errors');
 
 module.exports.login = (req, res, next) => {
@@ -16,7 +16,7 @@ module.exports.login = (req, res, next) => {
       res.send({ token });
     })
     .catch((err) => {
-      throw new AuthenticationError(err.message);
+      throw err;
     }).catch(next);
 };
 module.exports.getUsers = (req, res, next) => {
@@ -43,6 +43,7 @@ module.exports.getUser = (req, res, next) => {
       if (err.name === 'CastError') {
         throw new RequestError('Невалидный id');
       }
+      throw err;
     }).catch(next);
 };
 module.exports.createUser = (req, res, next) => {
@@ -58,6 +59,7 @@ module.exports.createUser = (req, res, next) => {
           if (err.name === 'MongoError' && err.code === 11000) {
             throw new ConflictError('Пользователь с таким email уже существует');
           }
+          throw err;
         }).catch(next);
     });
 };
@@ -80,6 +82,7 @@ module.exports.patchProfile = (req, res, next) => {
       if (err.name === 'CastError') {
         throw new RequestError('Невалидный id');
       }
+      throw err;
     }).catch(next);
 };
 module.exports.patchAvatar = (req, res, next) => {
@@ -101,6 +104,6 @@ module.exports.patchAvatar = (req, res, next) => {
       if (err.name === 'CastError') {
         throw new RequestError('Невалидный id');
       }
-      throw new RequestError(err.message);
+      throw err;
     }).catch(next);
 };
