@@ -28,8 +28,8 @@ module.exports.deleteCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError('Такой карточки не существует');
       }
-      if (req.user._id !== card.owner) {
-        throw new ForbiddenError(`Чужую карточку удалять нельзя${req.user._id} & ${card.owner}`);
+      if (`${req.user._id}` !== `${card.owner}`) {
+        throw new ForbiddenError(`Чужую карточку удалять нельзя ${req.user._id} & ${card.owner}`);
       }
       return res.send(card);
     })
