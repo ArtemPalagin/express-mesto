@@ -56,7 +56,7 @@ module.exports.dislikeCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError('Такой карточки не существует');
       }
-      return res.send({ card });
+      return res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
