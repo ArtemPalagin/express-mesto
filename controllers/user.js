@@ -21,13 +21,13 @@ module.exports.login = (req, res, next) => {
 };
 module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .then((users) => res.send({ data: users }))
+    .then((users) => res.send({ users }))
     .catch(next);
 };
 module.exports.getRegisteredUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
-      res.send({ data: user });
+      res.send({ user });
     })
     .catch(next);
 };
@@ -37,7 +37,7 @@ module.exports.getUser = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Такого пользователя не существует');
       }
-      return res.send({ data: user });
+      return res.send({ user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -52,7 +52,7 @@ module.exports.createUser = (req, res, next) => {
     .then((hash) => {
       User.create({ email, password: hash })
         .then((user) => {
-          res.send({ data: user });
+          res.send({ user });
         })
         .catch((err) => {
           if (err.name === 'MongoError' && err.code === 11000) {
@@ -71,7 +71,7 @@ module.exports.patchProfile = (req, res, next) => {
       if (!name || !about) {
         throw new RequestError('Есть незаполненное поле');
       }
-      return res.send({ data: user });
+      return res.send({ user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -92,7 +92,7 @@ module.exports.patchAvatar = (req, res, next) => {
       if (!avatar) {
         throw new RequestError('Есть незаполненное поле');
       }
-      return res.send({ data: user });
+      return res.send({ user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
