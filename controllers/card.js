@@ -23,22 +23,25 @@ module.exports.postCard = (req, res, next) => {
     }).catch(next);
 };
 module.exports.deleteCard = (req, res, next) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Такой карточки не существует');
       }
       if (`${req.user._id}` !== `${card.owner}`) {
-        throw new ForbiddenError(`Чужую карточку удалять нельзя ${req.user._id} & ${card.owner}`);
+        throw new ForbiddenError('Чужую карточку удалять нельзя');
       }
-      return res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new RequestError('Невалидный id ');
+        throw new RequestError('Невалидный id');
       }
-      throw err;
     }).catch(next);
+
+  Card.findByIdAndRemove(req.params.cardId).then((card) => res.send(card)).catch((err) => {
+    throw err;
+  })
+    .catch(next);
 };
 module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
@@ -50,7 +53,7 @@ module.exports.likeCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new RequestError('Невалидный id ');
+        throw new RequestError('Невалидный id');
       }
       throw err;
     }).catch(next);

@@ -31,7 +31,7 @@ app.get('/crash-test', () => {
 const allowedCors = [
   'https://praktikum.tk',
   'http://praktikum.tk',
-  'http://plg.mesto.students.nomoredomains.club',
+  'https://plg.mesto.students.nomoredomains.club',
 ];
 
 app.use((req, res, next) => {
@@ -58,13 +58,13 @@ app.use((req, res, next) => {
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
+    password: Joi.string().required().min(4),
   }),
 }), login);
 app.post('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
+    password: Joi.string().required().min(4),
   }),
 }), createUser);
 

@@ -22,12 +22,18 @@ module.exports.login = (req, res, next) => {
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ users }))
+    .catch((err) => {
+      throw err;
+    })
     .catch(next);
 };
 module.exports.getRegisteredUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       res.send({ user });
+    })
+    .catch((err) => {
+      throw err;
     })
     .catch(next);
 };
