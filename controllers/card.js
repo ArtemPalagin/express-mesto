@@ -42,7 +42,9 @@ module.exports.deleteCard = (req, res, next) => {
       if (err.name === 'CastError') {
         throw new RequestError('Невалидный id');
       }
-    }).catch(next);
+      throw err;
+    })
+    .catch(next);
 };
 module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
